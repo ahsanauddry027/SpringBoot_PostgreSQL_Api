@@ -47,10 +47,25 @@ flowchart LR
 ```
 src/main/java/com/example/studentapi/
 ├── controller/    receives HTTP requests and returns responses
+│   ├── EmployerJobController.java       5 job endpoints
+│   ├── EmployerProfileController.java   4 profile endpoints
+│   └── AdminEmployerController.java     2 admin endpoints
 ├── service/       business rules (who can do what, and when)
+│   ├── JobService.java
+│   └── EmployerService.java
 ├── repository/    database access through Spring Data JPA
+│   ├── JobRepository.java
+│   └── EmployerRepository.java
 ├── model/         entities that map to database tables
+│   ├── Job.java
+│   └── Employer.java
 └── dto/           the JSON shapes going in and out (the "View")
+    ├── JobRequest.java, JobResponse.java, JobStatusChange.java
+    └── EmployerRequest.java, EmployerResponse.java, VerificationDecision.java
+
+postman/
+├── Kaaj_API_Assignment_03.postman_collection.json   every request, ready to import
+└── sample-trade-licence.png                         a made-up document for the upload test
 ```
 
 ---
@@ -58,17 +73,6 @@ src/main/java/com/example/studentapi/
 ## 🔌 API reference
 
 Base URL: `http://127.0.0.1:1027/api/v1`
-
-### Feature 02 · Employer profile and verification
-
-| Method | Endpoint | Purpose | Headers | Body |
-|--------|----------|---------|---------|------|
-| `POST` | `/employer/profile` | Create the business profile | `Content-Type: application/json` | JSON |
-| `GET` | `/employer/profile` | View my profile | `X-Employer-Id` | None |
-| `PUT` | `/employer/profile` | Edit my profile | `X-Employer-Id`, `Content-Type: application/json` | JSON |
-| `POST` | `/employer/profile/document` | Upload a verification document | `X-Employer-Id` | form-data: `file` |
-| `GET` | `/admin/employers?status=PENDING` | Admin: the verification queue | None | None |
-| `POST` | `/admin/employers/{id}/verification` | Admin: approve or reject | `Content-Type: application/json` | JSON |
 
 ### Feature 01 · Post and manage jobs
 
@@ -140,6 +144,17 @@ stateDiagram-v2
     CLOSED --> PUBLISHED: REPOST
 ```
 
+### Feature 02 · Employer profile and verification
+
+| Method | Endpoint | Purpose | Headers | Body |
+|--------|----------|---------|---------|------|
+| `POST` | `/employer/profile` | Create the business profile | `Content-Type: application/json` | JSON |
+| `GET` | `/employer/profile` | View my profile | `X-Employer-Id` | None |
+| `PUT` | `/employer/profile` | Edit my profile | `X-Employer-Id`, `Content-Type: application/json` | JSON |
+| `POST` | `/employer/profile/document` | Upload a verification document | `X-Employer-Id` | form-data: `file` |
+| `GET` | `/admin/employers?status=PENDING` | Admin: the verification queue | None | None |
+| `POST` | `/admin/employers/{id}/verification` | Admin: approve or reject | `Content-Type: application/json` | JSON |
+
 <details>
 <summary><b>Example: create a business profile</b></summary>
 
@@ -204,6 +219,25 @@ stateDiagram-v2
 
 ---
 
+## ✅ Rules the API enforces
+
+The rules live in the service classes as plain Java, so no client can skip them.
+
+| Rule | What happens when it is broken |
+|------|--------------------------------|
+| A job needs a wage or wage range, with its period | `400 Bad Request` |
+| A job needs a title and a description, in Bangla or English | `400 Bad Request` |
+| A job needs a map location, unless it is remote | `400 Bad Request` |
+| An employer can only see and change their own jobs | `403 Forbidden` |
+| A status action must fit the job's current status (for example, only a published job can be paused) | `409 Conflict` |
+| A closed job cannot be edited until it is reposted | `409 Conflict` |
+| Only verified employers publish; other posts wait as drafts and go live on approval | Saved as `DRAFT` |
+| A business profile needs a name and a kind | `400 Bad Request` |
+| The verification document must be a JPEG, PNG or PDF of up to 3 MB | `400 Bad Request` |
+| Only a pending employer can be approved or rejected, and a rejection needs a reason | `409 Conflict` / `400 Bad Request` |
+
+---
+
 ## 🚀 Getting started
 
 **You need:** JDK 25 and PostgreSQL with a database named `student_db`.
@@ -242,6 +276,7 @@ Import `postman/Kaaj_API_Assignment_03.postman_collection.json` (Postman → Imp
 
 - The server runs on port **1027**, the last four digits of my student ID.
 - There is no login in this project, so the `X-Employer-Id` header says which employer is calling. The full Kaaj app uses session-based sign-in instead.
+- All 11 endpoints were tested in Postman; the collection is in `postman/`.
 - Uploaded documents are saved under `data/uploads/` with random file names and are never committed.
 - Errors come back as JSON `ProblemDetail` responses (RFC 9457) with a readable message.
 
