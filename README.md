@@ -31,6 +31,76 @@ This repository holds my individual part of the backend: the REST APIs for two f
 
 ---
 
+## ✨ Features
+
+### Feature 01 · Post and manage jobs
+
+An employer writes a job post and looks after it until the job is filled.
+
+**What an employer can do**
+
+- **Post a job** with a title in Bangla or English, a category, the number of openings, working hours, a shift and a job type (full-time, part-time or daily).
+- **State the wage up front.** A wage or wage range with its period (hour, day, week, month or piece) is required; a post without one is refused.
+- **Set the place** with a map pin, or mark the job as remote.
+- **List the requirements:** skills, documents such as a driving licence, and minimum years of experience.
+- **See all their posts**, newest first, or only those in one status.
+- **Edit a post** by sending just the fields that change.
+- **Pause, resume, close or repost** a post.
+
+**How it works**
+
+- A post is always in one of four statuses: `DRAFT`, `PUBLISHED`, `PAUSED` or `CLOSED`.
+- Publishing stamps the post with `publishedAt` and an `expiresAt` date 30 days later.
+- Every request names the calling employer, and an employer can only see and change their own posts.
+- Each status action is allowed only from certain statuses, so a paused job cannot be paused again and a closed job must be reposted before it is edited.
+
+| | |
+|---|---|
+| **Endpoints** | 5, under `/api/v1/employer/jobs` |
+| **Code** | `EmployerJobController` → `JobService` → `JobRepository` → `Job` |
+| **Table** | `job`, linked to `employer` by `employer_id` |
+| **Tested** | All 5 in Postman, plus the wage rule (`400`) and a refused status change (`409`) |
+
+### Feature 02 · Employer profile and verification
+
+An employer sets up a business profile and proves the business is real; an admin checks it.
+
+**What an employer can do**
+
+- **Create a business profile** with the business name, its kind (household, SME, company, agency or NGO), address, map pin and contact person.
+- **View and edit** the profile.
+- **Upload a trade licence or national ID** as a JPEG, PNG or PDF of up to 3 MB.
+
+**What an admin can do**
+
+- **See the verification queue:** every employer waiting for a decision, or those in any other status.
+- **Approve or reject** an employer. A rejection must come with a reason, which the employer sees on their profile.
+
+**How it works**
+
+- A profile moves through `UNVERIFIED` → `PENDING` (document uploaded) → `VERIFIED` or `REJECTED`.
+- A rejected employer can upload a new document and return to `PENDING`.
+- The uploaded file is saved on the server's disk under a random name; the API only ever says whether a document was uploaded.
+
+| | |
+|---|---|
+| **Endpoints** | 6: four under `/api/v1/employer/profile`, two under `/api/v1/admin/employers` |
+| **Code** | `EmployerProfileController`, `AdminEmployerController` → `EmployerService` → `EmployerRepository` → `Employer` |
+| **Table** | `employer` |
+| **Tested** | All 6 in Postman, with both an approval and a rejection, plus a refused second decision (`409`) |
+
+### How the two features work together
+
+Verification decides who can publish:
+
+1. An **unverified** employer posts a job. It is saved as a `DRAFT`.
+2. The employer uploads a document and the admin **approves** the business.
+3. The draft becomes `PUBLISHED` by itself, and every post by that employer now carries `"verifiedEmployer": true`, which the app shows as a "Verified" badge.
+
+A **verified** employer's new posts are published straight away.
+
+---
+
 ## 🏗️ Architecture
 
 The project follows the **MVC** pattern with a service layer.
