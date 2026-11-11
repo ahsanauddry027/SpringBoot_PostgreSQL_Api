@@ -19,7 +19,9 @@ import com.example.studentapi.dto.EmployerRequest;
 import com.example.studentapi.dto.VerificationDecision;
 import com.example.studentapi.model.Employer;
 import com.example.studentapi.model.Employer.VerificationStatus;
+import com.example.studentapi.model.Job;
 import com.example.studentapi.repository.EmployerRepository;
+import com.example.studentapi.repository.JobRepository;
 
 // @Service tells Spring: "create one object of this class at startup and keep it ready".
 // Such a Spring-managed object is called a bean. The business rules live here so that
@@ -33,6 +35,8 @@ public class EmployerService {
 
     // "final" means these are set once in the constructor and never replaced.
     private final EmployerRepository employerRepository;
+    // Needed for one rule: approving an employer publishes their waiting job posts.
+    private final JobRepository jobRepository;
     private final Path filesDir;
 
     // Constructor injection: Spring sees that this class needs an
@@ -41,9 +45,10 @@ public class EmployerService {
     // @Value reads kaaj.files.dir from application.properties; the part after ":"
     // is
     // the fallback used if that line is missing.
-    public EmployerService(EmployerRepository employerRepository,
+    public EmployerService(EmployerRepository employerRepository, JobRepository jobRepository,
             @Value("${kaaj.files.dir:./data/uploads}") String filesDir) {
         this.employerRepository = employerRepository;
+        this.jobRepository = jobRepository;
         // Turn "./data/uploads" into a full path such as
         // C:/.../studentapi/data/uploads.
         this.filesDir = Path.of(filesDir).toAbsolutePath();
@@ -125,6 +130,11 @@ public class EmployerService {
             employer.setVerificationStatus(VerificationStatus.VERIFIED);
             employer.setVerifiedAt(Instant.now()); // the moment of approval
             employer.setVerificationNote(null);
+            // Rule: only verified employers can publish. Their job posts waited as
+            // drafts until now, so approval makes them go live.
+            List<Job> drafts = jobRepository.findByEmployerIdAndStatus(id, Job.Status.DRAFT);
+            drafts.forEach(Job::publish); // each draft becomes PUBLISHED for 30 days
+            jobRepository.saveAll(drafts);
         } else if ("REJECT".equalsIgnoreCase(decision.decision())) {
             // Rule: the employer must be told why, so a reason is required.
             if (decision.reason() == null || decision.reason().isBlank()) {

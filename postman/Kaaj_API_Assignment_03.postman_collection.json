@@ -1,0 +1,850 @@
+{
+  "info": {
+    "name": "Kaaj API - Assignment 03 (22201027)",
+    "description": "CSE471 Lab Assignment 03. Spring Boot on port 1027. Feature 01: post and manage jobs. Feature 02: employer profile and verification.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "jobId",
+      "value": ""
+    },
+    {
+      "key": "newEmployerId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Feature 01 - Post and manage jobs",
+      "item": [
+        {
+          "name": "1. Post a job",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Employer-Id",
+                "value": "247b724a-8e53-4df3-97b6-342e278f0e9e"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:1027/api/v1/employer/jobs",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "1027",
+              "path": [
+                "api",
+                "v1",
+                "employer",
+                "jobs"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titleBn\": \"পিকআপ ড্রাইভার\",\n  \"titleEn\": \"Pickup Driver\",\n  \"descriptionEn\": \"Drive a pickup van on delivery routes around Tongi and Gazipur.\",\n  \"category\": \"Driver\",\n  \"jobType\": \"FULL_TIME\",\n  \"shift\": \"DAY\",\n  \"hours\": \"08:00-18:00\",\n  \"openings\": 2,\n  \"wageMin\": 16000,\n  \"wageMax\": 20000,\n  \"wagePeriod\": \"MONTH\",\n  \"latitude\": 23.8916,\n  \"longitude\": 90.4023,\n  \"minExperienceYears\": 2,\n  \"requiredSkills\": [\n    \"Pickup driving\"\n  ],\n  \"requiredDocuments\": [\n    \"Driving licence\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    pm.collectionVariables.set(\"jobId\", pm.response.json().id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "2. List my jobs",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Employer-Id",
+                "value": "247b724a-8e53-4df3-97b6-342e278f0e9e"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:1027/api/v1/employer/jobs",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "1027",
+              "path": [
+                "api",
+                "v1",
+                "employer",
+                "jobs"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "3. View one of my jobs",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Employer-Id",
+                "value": "247b724a-8e53-4df3-97b6-342e278f0e9e"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:1027/api/v1/employer/jobs/{{jobId}}",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "1027",
+              "path": [
+                "api",
+                "v1",
+                "employer",
+                "jobs",
+                "{{jobId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "4. Edit a job",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "X-Employer-Id",
+                "value": "247b724a-8e53-4df3-97b6-342e278f0e9e"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:1027/api/v1/employer/jobs/{{jobId}}",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "1027",
+              "path": [
+                "api",
+                "v1",
+                "employer",
+                "jobs",
+                "{{jobId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"openings\": 3,\n  \"wageMax\": 22000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "5. Change status - pause",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "X-Employer-Id",
+                "value": "247b724a-8e53-4df3-97b6-342e278f0e9e"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:1027/api/v1/employer/jobs/{{jobId}}/status",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "1027",
+              "path": [
+                "api",
+                "v1",
+                "employer",
+                "jobs",
+                "{{jobId}}",
+                "status"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"PAUSE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "5b. Change status - resume",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "X-Employer-Id",
+                "value": "247b724a-8e53-4df3-97b6-342e278f0e9e"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:1027/api/v1/employer/jobs/{{jobId}}/status",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "1027",
+              "path": [
+                "api",
+                "v1",
+                "employer",
+                "jobs",
+                "{{jobId}}",
+                "status"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"RESUME\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "5c. Change status - close",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "X-Employer-Id",
+                "value": "247b724a-8e53-4df3-97b6-342e278f0e9e"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:1027/api/v1/employer/jobs/{{jobId}}/status",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "1027",
+              "path": [
+                "api",
+                "v1",
+                "employer",
+                "jobs",
+                "{{jobId}}",
+                "status"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"CLOSE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "5d. Change status - repost",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "X-Employer-Id",
+                "value": "247b724a-8e53-4df3-97b6-342e278f0e9e"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:1027/api/v1/employer/jobs/{{jobId}}/status",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "1027",
+              "path": [
+                "api",
+                "v1",
+                "employer",
+                "jobs",
+                "{{jobId}}",
+                "status"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"REPOST\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Rule - a job without a wage is refused (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Employer-Id",
+                "value": "247b724a-8e53-4df3-97b6-342e278f0e9e"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:1027/api/v1/employer/jobs",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "1027",
+              "path": [
+                "api",
+                "v1",
+                "employer",
+                "jobs"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titleBn\": \"পিকআপ ড্রাইভার\",\n  \"titleEn\": \"Pickup Driver\",\n  \"descriptionEn\": \"Drive a pickup van on delivery routes around Tongi and Gazipur.\",\n  \"category\": \"Driver\",\n  \"jobType\": \"FULL_TIME\",\n  \"shift\": \"DAY\",\n  \"hours\": \"08:00-18:00\",\n  \"openings\": 2,\n  \"wagePeriod\": \"MONTH\",\n  \"latitude\": 23.8916,\n  \"longitude\": 90.4023,\n  \"minExperienceYears\": 2,\n  \"requiredSkills\": [\n    \"Pickup driving\"\n  ],\n  \"requiredDocuments\": [\n    \"Driving licence\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Verified-only publishing (links the two features)",
+      "item": [
+        {
+          "name": "a. Create a new employer (starts UNVERIFIED)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:1027/api/v1/employer/profile",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "1027",
+              "path": [
+                "api",
+                "v1",
+                "employer",
+                "profile"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Haque Household\",\n  \"kind\": \"HOUSEHOLD\",\n  \"address\": \"Road 7, Dhanmondi, Dhaka\",\n  \"latitude\": 23.7461,\n  \"longitude\": 90.3742,\n  \"contactPerson\": \"Mrs Haque\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    pm.collectionVariables.set(\"newEmployerId\", pm.response.json().id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "b. Post a job as that employer - saved as DRAFT",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Employer-Id",
+                "value": "{{newEmployerId}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:1027/api/v1/employer/jobs",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "1027",
+              "path": [
+                "api",
+                "v1",
+                "employer",
+                "jobs"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titleEn\": \"Cook\",\n  \"descriptionEn\": \"Cook lunch and dinner for a family of five.\",\n  \"category\": \"Household\",\n  \"jobType\": \"PART_TIME\",\n  \"wageMin\": 12000,\n  \"wagePeriod\": \"MONTH\",\n  \"latitude\": 23.7461,\n  \"longitude\": 90.3742\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "c. Upload the verification document - PENDING",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Employer-Id",
+                "value": "{{newEmployerId}}"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:1027/api/v1/employer/profile/document",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "1027",
+              "path": [
+                "api",
+                "v1",
+                "employer",
+                "profile",
+                "document"
+              ]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "d. Admin approves the employer - VERIFIED",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:1027/api/v1/admin/employers/{{newEmployerId}}/verification",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "1027",
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "employers",
+                "{{newEmployerId}}",
+                "verification"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"decision\": \"APPROVE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "e. List that employer's jobs - now PUBLISHED",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Employer-Id",
+                "value": "{{newEmployerId}}"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:1027/api/v1/employer/jobs",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "1027",
+              "path": [
+                "api",
+                "v1",
+                "employer",
+                "jobs"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Feature 02 - Employer profile and verification",
+      "item": [
+        {
+          "name": "1. Create the business profile",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:1027/api/v1/employer/profile",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "1027",
+              "path": [
+                "api",
+                "v1",
+                "employer",
+                "profile"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Karim Transport\",\n  \"kind\": \"SME\",\n  \"address\": \"Station Road, Tongi, Gazipur\",\n  \"latitude\": 23.8916,\n  \"longitude\": 90.4023,\n  \"contactPerson\": \"Md. Karim\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2. View my business profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Employer-Id",
+                "value": "247b724a-8e53-4df3-97b6-342e278f0e9e"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:1027/api/v1/employer/profile",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "1027",
+              "path": [
+                "api",
+                "v1",
+                "employer",
+                "profile"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "3. Edit my business profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "X-Employer-Id",
+                "value": "247b724a-8e53-4df3-97b6-342e278f0e9e"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:1027/api/v1/employer/profile",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "1027",
+              "path": [
+                "api",
+                "v1",
+                "employer",
+                "profile"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Karim Transport\",\n  \"kind\": \"COMPANY\",\n  \"address\": \"Station Road, Tongi, Gazipur\",\n  \"latitude\": 23.8916,\n  \"longitude\": 90.4023,\n  \"contactPerson\": \"Md. Karim\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "4. Upload the verification document",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Employer-Id",
+                "value": "247b724a-8e53-4df3-97b6-342e278f0e9e"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:1027/api/v1/employer/profile/document",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "1027",
+              "path": [
+                "api",
+                "v1",
+                "employer",
+                "profile",
+                "document"
+              ]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "5. Admin - verification queue",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://127.0.0.1:1027/api/v1/admin/employers?status=PENDING",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "1027",
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "employers"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "PENDING"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "6. Admin - approve or reject",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:1027/api/v1/admin/employers/c3ce8046-0b8b-441a-8fde-5570e5284bc6/verification",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "1027",
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "employers",
+                "c3ce8046-0b8b-441a-8fde-5570e5284bc6",
+                "verification"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"decision\": \"APPROVE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

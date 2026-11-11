@@ -24,7 +24,7 @@ This repository holds my individual part of the backend: the REST APIs for two f
 
 | # | Feature | What it does | Status |
 |---|---------|--------------|--------|
-| 01 | **Post and manage jobs** | Employers post a job with a required wage range, then edit, pause, close or repost it | 🚧 In progress |
+| 01 | **Post and manage jobs** | Employers post a job with a required wage range, then edit, pause, close or repost it | ✅ Built |
 | 02 | **Employer profile and verification** | Employers create a business profile and upload a trade licence or national ID; an admin approves or rejects it | ✅ Built |
 
 > Only **verified** employers can publish jobs. An unverified employer's post stays a draft until an admin approves the business.
@@ -72,13 +72,73 @@ Base URL: `http://127.0.0.1:1027/api/v1`
 
 ### Feature 01 · Post and manage jobs
 
-| Method | Endpoint | Purpose |
-|--------|----------|---------|
-| `POST` | `/employer/jobs` | Post a job |
-| `GET` | `/employer/jobs` | List my jobs |
-| `GET` | `/employer/jobs/{id}` | View one of my jobs |
-| `PATCH` | `/employer/jobs/{id}` | Edit a job |
-| `PATCH` | `/employer/jobs/{id}/status` | Pause, resume, close or repost |
+| Method | Endpoint | Purpose | Headers | Body |
+|--------|----------|---------|---------|------|
+| `POST` | `/employer/jobs` | Post a job | `X-Employer-Id`, `Content-Type: application/json` | JSON |
+| `GET` | `/employer/jobs` | List my jobs (optional `?status=`) | `X-Employer-Id` | None |
+| `GET` | `/employer/jobs/{id}` | View one of my jobs | `X-Employer-Id` | None |
+| `PATCH` | `/employer/jobs/{id}` | Edit a job (only the fields sent) | `X-Employer-Id`, `Content-Type: application/json` | JSON |
+| `PATCH` | `/employer/jobs/{id}/status` | Pause, resume, close or repost | `X-Employer-Id`, `Content-Type: application/json` | JSON |
+
+<details>
+<summary><b>Example: post a job</b></summary>
+
+**Request** · `POST /api/v1/employer/jobs`
+
+```json
+{
+  "titleBn": "পিকআপ ড্রাইভার",
+  "titleEn": "Pickup Driver",
+  "descriptionEn": "Drive a pickup van on delivery routes around Tongi and Gazipur.",
+  "category": "Driver",
+  "jobType": "FULL_TIME",
+  "shift": "DAY",
+  "hours": "08:00-18:00",
+  "openings": 2,
+  "wageMin": 16000,
+  "wageMax": 20000,
+  "wagePeriod": "MONTH",
+  "latitude": 23.8916,
+  "longitude": 90.4023,
+  "minExperienceYears": 2,
+  "requiredSkills": ["Pickup driving"],
+  "requiredDocuments": ["Driving licence"]
+}
+```
+
+**Response** · `201 Created`, with `"status": "PUBLISHED"` for a verified employer or `"status": "DRAFT"` for anyone else.
+
+A post without a wage is refused with `400 Bad Request`: wages are always shown up front.
+
+</details>
+
+<details>
+<summary><b>Example: change a job's status</b></summary>
+
+**Request** · `PATCH /api/v1/employer/jobs/{id}/status`
+
+```json
+{ "action": "PAUSE" }
+```
+
+The action is `PAUSE`, `RESUME`, `CLOSE` or `REPOST`. An action that does not fit the job's current status is refused with `409 Conflict`.
+
+</details>
+
+### Job status flow
+
+```mermaid
+stateDiagram-v2
+    [*] --> DRAFT: posted by an unverified employer
+    [*] --> PUBLISHED: posted by a verified employer
+    DRAFT --> PUBLISHED: admin approves the employer
+    PUBLISHED --> PAUSED: PAUSE
+    PAUSED --> PUBLISHED: RESUME
+    DRAFT --> CLOSED: CLOSE
+    PUBLISHED --> CLOSED: CLOSE
+    PAUSED --> CLOSED: CLOSE
+    CLOSED --> PUBLISHED: REPOST
+```
 
 <details>
 <summary><b>Example: create a business profile</b></summary>
@@ -148,7 +208,11 @@ stateDiagram-v2
 
 **You need:** JDK 25 and PostgreSQL with a database named `student_db`.
 
-1. **Clone the repository** and open the folder.
+1. **Clone the repository** and open the folder:
+
+   ```powershell
+   git clone https://github.com/ahsanauddry027/SpringBoot_PostgreSQL_Api.git
+   ```
 
 2. **Add your database password.** Create a file named `.env` in the project root:
 
@@ -167,6 +231,10 @@ stateDiagram-v2
 4. **Check it works:** open `http://127.0.0.1:1027/api/hello`
 
 Hibernate creates the tables on first start, so there is no SQL to run by hand.
+
+### Try it in Postman
+
+Import `postman/Kaaj_API_Assignment_03.postman_collection.json` (Postman → Import). It holds every request for both features, plus a short flow that shows a draft going live when its employer is approved. The employer ids in it belong to my local database, so create your own employer first and swap in its `id`. `postman/sample-trade-licence.png` is a made-up document for testing the upload.
 
 ---
 
